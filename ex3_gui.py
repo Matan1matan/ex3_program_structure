@@ -1,13 +1,8 @@
 """
-adder.py
+ex3_gui.py
 ~~~~~~
 
-Creates a simple GUI for summing two numbers.
 """
-from plainbox.vendor.sphinxarg.parser import parser_navigate
-from scapy.all import *
-import matplotlib.pyplot as plt
-
 import tkinter
 from tkinter import *
 from tkinter import ttk
