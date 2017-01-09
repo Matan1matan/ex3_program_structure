@@ -32,7 +32,7 @@ class ex3_gui(ttk.Frame):
         self.display_the_graph_button.configure(state='disable')
         self.display_by_Mac_addresses_button.configure(state='disable')
         self.answer_label['text'] = ""
-        self.fname = askopenfilename(filetypes=(("PCAP files", "*.cap"),))
+        self.fname = askopenfilename(filetypes=(("PCAP files", "*.cap"),),initialdir=('./WiFi_Data_test'))
         if self.fname:
             try:
                 self.is_used = True
@@ -115,10 +115,10 @@ class ex3_gui(ttk.Frame):
             child.grid_configure(padx=10, pady=10)
 
     def display_by_AP_func(self):
-        self.parser_object.display_by_access_points()
+        self.parser_object.display_by_SSIDs()
 
     def display_by_mac_addresses(self):
-        self.parser_object.display_by_MAC_addresses()
+        self.parser_object.display_by_receiver()
 
     def display_graph(self):
         self.parser_object.display_graph()
