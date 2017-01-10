@@ -35,7 +35,7 @@ class parser:
         for ma in mac_adresses:
             MA.append(mac_adresses[ma])
 
-        plt.close()
+        plt.clf()
         plt.suptitle('Number of packets by receivers', fontsize=14, fontweight='bold')
         plt.bar(range(len(mac_adresses)), sorted(MA), align='center', color=MY_COLORS)
 
@@ -69,7 +69,7 @@ class parser:
         for ma in mac_adresses:
             MA.append(mac_adresses[ma])
 
-        plt.close()
+        plt.clf()
         plt.suptitle('Number of packets by senders', fontsize=14, fontweight='bold')
         plt.bar(range(len(mac_adresses)), sorted(MA), align='center', color=MY_COLORS)
 
@@ -115,7 +115,7 @@ class parser:
 
         networks_list = sorted(networks.items(), key=itemgetter(1))
 
-        plt.close()
+        plt.clf()
         plt.suptitle('Number of packets by SSIDs', fontsize=14, fontweight='bold')
         plt.bar(range(len(networks_list)), [int(i[1]) for i in networks_list], align='center', color=MY_COLORS)
 
@@ -164,7 +164,7 @@ class parser:
 
     def display_graph(self):
 
-        plt.close()
+        plt.clf()
         G = nx.Graph()
 
         count = 0
@@ -277,14 +277,18 @@ class parser:
 
         plt.show()
 
-        # return "Channel efficiency: " + str(ans) + "%"
+        # return "Channel efficiency: " + str(ans) + "%"\
+
+
+    def destroy_fig(self):
+        if plt:
+            plt.close()
 
 def open_file(file_name='/home/matan/PycharmProjects/second_project/pcg/dasda/file1.cap'):
 # def open_file(file_name='/home/matan/Downloads/test.pcap'):
 #     filename = input('Enter file name: ')
 
 
-    # return ex3('/home/matan/PycharmProjects/second_project/pcg/dasda/' + str(filename) + '.cap')
     return parser(file_name)
 
 
@@ -293,9 +297,9 @@ def main():
 
     # ex3_object.display_by_MAC_addresses()
     # ex3_object.display_by_access_points()
-    ex3_object.display_graph()
+    # ex3_object.display_graph()
     # ex3_object.display_frames()
-    # ex3_object.stam()
+    ex3_object.stam()
     # ex3_object.stam2()
     # ex3_object.stam3()
     # print ("-start-")

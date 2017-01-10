@@ -17,43 +17,37 @@ class ex3_gui(ttk.Frame):
     def __init__(self, parent, *args, **kwargs):
         ttk.Frame.__init__(self, parent, *args, **kwargs)
         self.root = parent
-        self.fname = "aa"
+        # self.fname = ""
         self.is_used = False
         self.parser_object = None
         self.init_gui()
 
-    def on_quit(self):
-        """Exits program."""
-        quit()
-
     def load_file(self, event=None):
 
-        self.display_by_AP_button.configure(state='disable')
-        self.display_the_graph_button.configure(state='disable')
-        self.display_by_Mac_addresses_button.configure(state='disable')
+        for i in range(len(self.button_list)-1):
+            self.button_list[i+1].configure(state='disable')
+
         self.answer_label['text'] = ""
-        self.fname = askopenfilename(filetypes=(("PCAP files", "*.cap"),),initialdir=('./WiFi_Data_test'))
+        self.fname = askopenfilename(filetypes=(("PCAP files", ("*.pcap", "*.cap")),),initialdir=('./WiFi_Data_test'))
         if self.fname:
             try:
                 self.is_used = True
                 self.parser_object = ex3.open_file(self.fname)
                 self.answer_label['text'] = "File loaded successfully!"
-                self.display_by_AP_button.configure(state='enable')
-                self.display_the_graph_button.configure(state='enable')
-                self.display_by_Mac_addresses_button.configure(state='enable')
-                print("File loaded successfully!")
-                # self.button.destroy()
+
+                for i in range(len(self.button_list) - 1):
+                    self.button_list[i + 1].configure(state='enable')
+
 
             except:  # <- naked except is a bad idea
                 showerror("Open Source File", "Failed to read file\n'%s'" % self.fname)
 
 
         elif self.is_used:
-            self.display_by_AP_button.configure(state='enable')
-            self.display_the_graph_button.configure(state='enable')
-            self.display_by_Mac_addresses_button.configure(state='enable')
 
-            # return
+            for i in range(len(self.button_list) - 1):
+                self.button_list[i + 1].configure(state='enable')
+
 
     def init_gui(self):
         """Builds GUI."""
@@ -61,7 +55,7 @@ class ex3_gui(ttk.Frame):
         self.root.title('PCAP Parser')
         self.root.option_add('*tearOff', 'FALSE')
         self.grid(column=0, row=0, sticky='nsew')
-
+        self.button_list = []
         # Menu
         # self.menubar = tkinter.Menu(self.root)
         # self.menu_file = tkinter.Menu(self.menubar)
@@ -69,36 +63,27 @@ class ex3_gui(ttk.Frame):
         # self.menubar.add_cascade(menu=self.menu_file, label='File')
         # self.root.config(menu=self.menubar)
 
-        self.button = ttk.Button(self, compound=tkinter.TOP, text="Browse", command=self.load_file)
-        self.button.grid(column=1, row=3, columnspan=12, sticky=W + E + N + S)
+        self.b_browse = ttk.Button(self, compound=tkinter.TOP, text="Browse", command=self.load_file)
+        self.button_list.append(self.b_browse)
+        self.b_browse.grid(column=1, row=3, columnspan=12, sticky=W + E + N + S)
 
-        # self.num1_entry = ttk.Entry(self, width=5)
-        # self.num1_entry.grid(column=1, row=2)
-        #
-        # self.num2_entry = ttk.Entry(self, width=5)
-        # self.num2_entry.grid(column=3, row=2)
+        self.button_list.append(ttk.Button(self, text='Display by SSIDs',
+                                          command=self.display_by_SSIDs))
+        self.button_list.append(ttk.Button(self, text='Display by sender',
+                                                     command=self.display_by_sender))
+        self.button_list.append(ttk.Button(self, text='Display by receiver',
+                                           command=self.display_by_receiver))
+        self.button_list.append(ttk.Button(self, text='Display Graph',
+                                              command=self.display_graph))
+        self.button_list.append(ttk.Button(self, text='Display channel efficiency',
+                                              command=self.display_channel_efficiency))
+        self.button_list.append(ttk.Button(self, text='Display Graph',
+                                              command=self.display_graph))
 
-        self.display_by_AP_button = ttk.Button(self, text='Display by AccessPoints',
-                                               command=self.display_by_AP_func)
-        self.display_by_AP_button.grid(column=0, row=5, columnspan=12, sticky=W + N + S)
-
-        self.display_by_AP_button.configure(state='disable')
-
-        self.display_by_Mac_addresses_button = ttk.Button(self, text='Display by Mac addresses',
-                                                          command=self.display_by_mac_addresses)
-        self.display_by_Mac_addresses_button.grid(column=0, row=7, columnspan=12, sticky=W + N + S)
-
-        self.display_by_Mac_addresses_button.configure(state='disable')
-
-        self.display_the_graph_button = ttk.Button(self, text='Display Graph',
-                                                   command=self.display_graph)
-        self.display_the_graph_button.grid(column=0, row=9, columnspan=12, sticky=W + N + S)
-
-        self.display_the_graph_button.configure(state='disable')
 
         self.answer_frame = ttk.LabelFrame(self, text='Status',
                                            height=100)
-        self.answer_frame.grid(column=0, row=12, columnspan=12, sticky='nesw')
+        self.answer_frame.grid(column=0, row=5+len(self.button_list), columnspan=12, sticky='nesw')
 
         self.answer_label = ttk.Label(self.answer_frame, text='')
         self.answer_label.grid(column=0, row=0)
@@ -109,40 +94,42 @@ class ex3_gui(ttk.Frame):
 
         ttk.Separator(self, orient='horizontal').grid(column=0,
                                                       row=1, columnspan=12, sticky='ew')
+
+        for i in range(len(self.button_list)-1):
+            temp = self.button_list[i+1]
+            temp.grid(column=0, row=4+i, columnspan=12, sticky=W + N + S)
+            temp.configure(state='disable')
+
+        # shortcuts
         self.root.bind("<Control-o>", self.load_file)
+        self.root.bind("<Control-w>", self.ask_quit)
 
         for child in self.winfo_children():
             child.grid_configure(padx=10, pady=10)
 
-    def display_by_AP_func(self):
+    def display_by_SSIDs(self):
         self.parser_object.display_by_SSIDs()
 
-    def display_by_mac_addresses(self):
+    def display_by_receiver(self):
         self.parser_object.display_by_receiver()
+
+    def display_by_sender(self):
+        self.parser_object.display_by_sender()
 
     def display_graph(self):
         self.parser_object.display_graph()
 
+    def display_channel_efficiency(self):
+        self.parser_object.display_channel_efficiency()
 
-    def flash_open(self, aa):
-        print("Hey!")
-
-
-        # print(self.fname)
-
-        # self.pcap_file = rdpcap(self.fname)
-
-
-
-        # print(self.pcap_file[0].show())
-        # def printFilename(self):
-        #
-        #     self.filename_frame['text'] = self.button
-        #     print(self.fname)
-        #     # return
-
+    def ask_quit(self, event=None):
+        if tkinter.messagebox.askokcancel("quit", "Are you sure you want to exit?"):
+            if (self.parser_object):
+                self.parser_object.destroy_fig()
+            root.destroy()
 
 if __name__ == '__main__':
     root = tkinter.Tk()
-    ex3_gui(root)
+    a = ex3_gui(root)
+    root.protocol("WM_DELETE_WINDOW", a.ask_quit)
     root.mainloop()
