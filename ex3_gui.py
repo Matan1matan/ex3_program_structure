@@ -17,7 +17,6 @@ class ex3_gui(ttk.Frame):
     def __init__(self, parent, *args, **kwargs):
         ttk.Frame.__init__(self, parent, *args, **kwargs)
         self.root = parent
-        # self.fname = ""
         self.is_used = False
         self.parser_object = None
         self.init_gui()
@@ -56,16 +55,12 @@ class ex3_gui(ttk.Frame):
         self.root.option_add('*tearOff', 'FALSE')
         self.grid(column=0, row=0, sticky='nsew')
         self.button_list = []
-        # Menu
-        # self.menubar = tkinter.Menu(self.root)
-        # self.menu_file = tkinter.Menu(self.menubar)
-        # self.menu_file.add_command(label='Exit', command=self.on_quit)
-        # self.menubar.add_cascade(menu=self.menu_file, label='File')
-        # self.root.config(menu=self.menubar)
+
+        columnspan = 12
 
         self.b_browse = ttk.Button(self, compound=tkinter.TOP, text="Browse", command=self.load_file)
         self.button_list.append(self.b_browse)
-        self.b_browse.grid(column=1, row=3, columnspan=12, sticky=W + E + N + S)
+        self.b_browse.grid(column=1, row=3, columnspan=columnspan, sticky=W + E + N + S)
 
         self.button_list.append(ttk.Button(self, text='Display by SSIDs',
                                           command=self.display_by_SSIDs))
@@ -77,27 +72,26 @@ class ex3_gui(ttk.Frame):
                                               command=self.display_graph))
         self.button_list.append(ttk.Button(self, text='Display channel efficiency',
                                               command=self.display_channel_efficiency))
-        self.button_list.append(ttk.Button(self, text='Display Graph',
-                                              command=self.display_graph))
-
+        self.button_list.append(ttk.Button(self, text='Display bytes per second',
+                                              command=self.display_bytes_per_second))
 
         self.answer_frame = ttk.LabelFrame(self, text='Status',
                                            height=100)
-        self.answer_frame.grid(column=0, row=5+len(self.button_list), columnspan=12, sticky='nesw')
+        self.answer_frame.grid(column=0, row=5+len(self.button_list), columnspan=columnspan, sticky='nesw')
 
         self.answer_label = ttk.Label(self.answer_frame, text='')
         self.answer_label.grid(column=0, row=0)
 
         # Labels that remain constant throughout execution.
         ttk.Label(self, text='PCAP Parser').grid(column=0, row=0,
-                                                 columnspan=12)
+                                                 columnspan=columnspan)
 
         ttk.Separator(self, orient='horizontal').grid(column=0,
-                                                      row=1, columnspan=12, sticky='ew')
+                                                      row=1, columnspan=columnspan, sticky='ew')
 
         for i in range(len(self.button_list)-1):
             temp = self.button_list[i+1]
-            temp.grid(column=0, row=4+i, columnspan=12, sticky=W + N + S)
+            temp.grid(column=0, row=4+i, columnspan=columnspan, sticky=W + N + S)
             temp.configure(state='disable')
 
         # shortcuts
@@ -122,8 +116,12 @@ class ex3_gui(ttk.Frame):
     def display_channel_efficiency(self):
         self.parser_object.display_channel_efficiency()
 
+    def display_bytes_per_second(self):
+        self.parser_object.display_bytes_per_second()
+
     def ask_quit(self, event=None):
-        if tkinter.messagebox.askokcancel("quit", "Are you sure you want to exit?"):
+        if tkinter.messagebox:
+            tkinter.messagebox.askokcancel("quit", "Are you sure you want to exit?")
             if (self.parser_object):
                 self.parser_object.destroy_fig()
             root.destroy()
