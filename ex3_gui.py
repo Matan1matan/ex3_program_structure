@@ -70,6 +70,8 @@ class ex3_gui(ttk.Frame):
                                            command=self.display_by_receiver))
         self.button_list.append(ttk.Button(self, text='Display Graph',
                                               command=self.display_graph))
+        self.button_list.append(ttk.Button(self, text='Display Frames',
+                                           command=self.display_frames))
         self.button_list.append(ttk.Button(self, text='Display channel efficiency',
                                               command=self.display_channel_efficiency))
         self.button_list.append(ttk.Button(self, text='Display bytes per second',
@@ -112,6 +114,9 @@ class ex3_gui(ttk.Frame):
 
     def display_graph(self):
         self.parser_object.display_graph()
+
+    def display_frames(self):
+        self.parser_object.display_frames()
 
     def display_channel_efficiency(self):
         self.parser_object.display_channel_efficiency()
