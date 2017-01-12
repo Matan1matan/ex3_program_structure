@@ -3,6 +3,8 @@ ex3.py
 ~~~~~~
 
 """
+import logging
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 from scapy.all import *
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -46,7 +48,6 @@ class parser:
         ax.tick_params(axis='y', colors='red')
         ax.set_xticklabels(ax.xaxis.get_majorticklabels(), rotation=45)
 
-        plt.legend()
         plt.show()
 
     def display_by_sender(self):
@@ -78,7 +79,6 @@ class parser:
         ax.tick_params(axis='y', colors='red')
         ax.set_xticklabels(ax.xaxis.get_majorticklabels(), rotation=45)
 
-        plt.legend()
         plt.show()
 
     def display_by_SSIDs(self):
@@ -123,7 +123,6 @@ class parser:
         ax.tick_params(axis='y', colors='red')
         ax.set_xticklabels(ax.xaxis.get_majorticklabels(), rotation=30)
 
-        plt.legend()
         plt.show()
 
     def display_frames(self):
@@ -225,6 +224,37 @@ class parser:
         plt.plot(time_unit, bits_list, marker='.', color='blue')
         plt.show()
 
+    def display_PER(self):
+
+        number_of_pkts = len(self.pcap_file)
+        retransmission_pkts = 0
+
+        for pkt in self.pcap_file:
+
+            if (pkt[Dot11].FCfield & 0x4) != 0:
+                retransmission_pkts += 1
+
+        ans = retransmission_pkts / number_of_pkts
+        ans = float("%.2f" % ans)
+        labels = ['Standard packet', 'Retransmitted packet']
+        sizes = [100.0 - ans,ans]
+
+
+        colors = ['g', 'firebrick']
+
+        # Make a pie graph
+        plt.clf()
+        plt.figure(num=1, figsize=(8, 6))
+        plt.axes(aspect=1)
+        plt.suptitle('PER', fontsize=14, fontweight='bold')
+        plt.title('Pakcet Error Rate', fontsize=10)
+        plt.rcParams.update({'font.size': 13})
+        plt.pie(sizes, labels=labels, autopct='%.2f%%', startangle=-30, colors=colors, pctdistance=0.7,
+                labeldistance=1.2)
+
+        plt.show()
+
+
     def destroy_fig(self):
         if plt:
             plt.close()
@@ -248,8 +278,8 @@ def main():
     # ex3_object.display_channel_efficiency()
     # ex3_object.display_by_sender()
     # ex3_object.display_by_receiver()
-    ex3_object.display_bytes_per_second()
-
+    # ex3_object.display_bytes_per_second()
+    ex3_object.display_PER()
 
 if __name__ == '__main__':
     main()
