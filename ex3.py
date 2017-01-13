@@ -231,14 +231,13 @@ class parser:
 
         for pkt in self.pcap_file:
 
-            if (pkt[Dot11].FCfield & 0x4) != 0:
+            if (pkt[Dot11].FCfield & 0x8) != 0:
                 retransmission_pkts += 1
 
-        ans = retransmission_pkts / number_of_pkts
+        ans = (retransmission_pkts / number_of_pkts) * 100
         ans = float("%.2f" % ans)
-        labels = ['Standard packet', 'Retransmitted packet']
+        labels = ['Standard packets', 'Retransmitted packets']
         sizes = [100.0 - ans,ans]
-
 
         colors = ['g', 'firebrick']
 
@@ -247,9 +246,9 @@ class parser:
         plt.figure(num=1, figsize=(8, 6))
         plt.axes(aspect=1)
         plt.suptitle('PER', fontsize=14, fontweight='bold')
-        plt.title('Pakcet Error Rate', fontsize=10)
-        plt.rcParams.update({'font.size': 13})
-        plt.pie(sizes, labels=labels, autopct='%.2f%%', startangle=-30, colors=colors, pctdistance=0.7,
+        plt.title('Packet Error Rate', fontsize=10)
+        plt.rcParams.update({'font.size': 11})
+        plt.pie(sizes, labels=labels, autopct='%.2f%%', startangle=0, colors=colors, pctdistance=0.7,
                 labeldistance=1.2)
 
         plt.show()
