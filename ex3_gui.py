@@ -150,7 +150,6 @@ class ex3_gui(ttk.Frame):
         b = Button(top, text="OK", command=self.ok)
         b.pack(pady=5)
 
-
     def ok(self):
 
         self.parser_object.display_graph_by_specific_mac(self.e.get())

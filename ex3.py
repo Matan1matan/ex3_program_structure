@@ -85,7 +85,6 @@ class parser:
     def display_by_SSIDs(self):
 
         networks = {}
-
         for pkt in self.pcap_file:
             if pkt.haslayer(Dot11Elt):
 
