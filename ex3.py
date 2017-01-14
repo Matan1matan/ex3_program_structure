@@ -263,7 +263,7 @@ class parser:
 
         start_time = self.pcap_file[0].time
 
-        f = open('output', 'w')
+        f = open('output.txt', 'w')
 
         for pkt in self.pcap_file:
 
@@ -290,7 +290,7 @@ class parser:
 
 
         plt.clf()
-        plt.suptitle('communication with' + str(mac_address), fontsize=14, fontweight='bold')
+        plt.suptitle('communication with' + " " + str(mac_address), fontsize=14, fontweight='bold')
         plt.title("Number of users: " + str(count))
         plt.rcParams.update({'font.size': 10})
         G.add_edges_from(edges_list)
@@ -300,7 +300,7 @@ class parser:
 
     def display_by_time_interval(self, mac_address, start_time, end_time):
 
-        mac_adresses = {}  # new dictionary
+        mac_addresses = {}  # new dictionary
 
 
         begin_time = self.pcap_file[0].time
@@ -309,23 +309,24 @@ class parser:
 
             time = pkt.time - begin_time
             if (pkt[Dot11].addr1 == mac_address) and (start_time <= time and time <= end_time):
-                mac_adresses.update({pkt[Dot11].addr2: 0})
+                mac_addresses.update({pkt[Dot11].addr2: 0})
 
         for pkt in self.pcap_file:
 
             time = pkt.time - begin_time
             if (pkt[Dot11].addr1 == mac_address) and (start_time <= time and time <= end_time):
-                mac_adresses[pkt[Dot11].addr2] += 1
+                mac_addresses[pkt[Dot11].addr2] += 1
 
         MA = []
-        for ma in mac_adresses:
-            MA.append(mac_adresses[ma])
+        for ma in mac_addresses:
+            MA.append(mac_addresses[ma])
 
         plt.clf()
-        plt.suptitle('Number of packets by interval and MACaddress', fontsize=14, fontweight='bold')
-        plt.bar(range(len(mac_adresses)), sorted(MA), align='center', color=MY_COLORS)
+        plt.suptitle('Number of packets by interval and MAC address sender', fontsize=14, fontweight='bold')
+        plt.title("MAC address sender: " + str(mac_address))
+        plt.bar(range(len(mac_addresses)), sorted(MA), align='center', color=MY_COLORS)
 
-        plt.xticks(range(len(mac_adresses)), sorted(mac_adresses.keys()))
+        plt.xticks(range(len(mac_addresses)), sorted(mac_addresses.keys()))
 
         plt.rcParams.update({'font.size': 10})
 
@@ -340,50 +341,7 @@ class parser:
 
         plt.show()
 
-
-
-
-    def stam2(self):
-
-        # getsrcdst = lambda x: (x.info.decode("utf-8", "ignore"),x.addr1, x.addr2, x.addr3)
-        getsrcdst = lambda x: (x.info.decode("utf-8", "ignore"), x.addr3)
-
-        for pkt in self.pcap_file:
-            try:
-                c = getsrcdst(pkt)
-                print(c)
-            except AttributeError:
-                pass
-
-    def stam3(self):
-
-        aps = {}
-
-        for p in self.pcap_file:
-            # if ((p.haslayer(Dot11Beacon) or p.haslayer(Dot11ProbeResp)) and not p[Dot11].addr3):
-            if ((p.haslayer(Dot11Beacon) or p.haslayer(Dot11ProbeResp))):
-                ssid = p[Dot11Elt].info.decode("utf-8", "ignore")
-                bssid = p[Dot11].addr3
-                channel = int(ord(p[Dot11Elt:3].info))
-                capability = p.sprintf("{Dot11Beacon:%Dot11Beacon.cap%}\
-                            {Dot11ProbeResp:%Dot11ProbeResp.cap%}")
-
-                # Check for encrypted networks
-                if re.search("privacy", capability):
-                    enc = 'Encrypted'
-                else:
-                    enc = 'Not encrypted'
-
-                # Save discovered AP
-                aps[p[Dot11].addr3] = enc
-
-                # Display discovered AP
-                if bssid is not "":
-                    print("%02d\t%s\t%s\t%s" % (int(channel), enc, bssid, ssid))
-
-
 # End of class ex3
-
 
 def open_file(file_name='/home/matan/PycharmProjects/second_project/pcg/dasda/file1.cap'):
     return parser(file_name)
@@ -407,7 +365,6 @@ def main():
     # ex3_object.stam3()
     # ex3_object.save_information_as_text()
     # ex3_object.display_graph_by_specific_mac("08:08:c2:d1:f7:9f")
-
     ex3_object.display_by_time_interval('ff:ff:ff:ff:ff:ff',0,28)
 
 

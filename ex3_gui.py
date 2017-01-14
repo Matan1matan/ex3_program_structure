@@ -82,7 +82,7 @@ class ex3_gui(ttk.Frame):
                                               command=self.save_information_as_text))
         self.button_list.append(ttk.Button(self, text='Display graph by a specific mac address',
                                               command=self.display_graph_by_specific_mac))
-        self.button_list.append(ttk.Button(self, text='Display graph by a specific mac address',
+        self.button_list.append(ttk.Button(self, text='Display by time interval',
                                               command=self.display_by_time_interval))
 
         self.answer_frame = ttk.LabelFrame(self, text='Status',
