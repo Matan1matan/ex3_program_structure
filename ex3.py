@@ -4,6 +4,7 @@ ex3.py
 
 """
 import logging
+
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 from scapy.all import *
 import matplotlib.pyplot as plt
@@ -138,7 +139,6 @@ class parser:
 
         pies = [pie for (pie, percent) in sorted((frame_list), key=itemgetter(1))]
         percents = [percent for (pie, percent) in sorted((frame_list), key=itemgetter(1))]
-        # percents = [str(adjust_text(percent, arrowprops=dict(arrowstyle="-", color='k', lw=0.5))) for (pie, percent) in sorted((frame_list), key=itemgetter(1))]
 
         # Make a pie graph.
         colors = ['gold', 'lightgreen', 'r', 'orange', 'c', 'plum']
@@ -259,6 +259,129 @@ class parser:
             plt.close()
 
 
+    def save_information_as_text(self):
+
+        start_time = self.pcap_file[0].time
+
+        f = open('output', 'w')
+
+        for pkt in self.pcap_file:
+
+            f.write("Time: " + str(pkt.time - start_time) + " | Sender: " + str(pkt[Dot11].addr1) + " | Receiver: " + str(pkt[Dot11].addr2) + "\nThe info of this packet:\n" + str(pkt[Dot11]) + "\n------\n")
+
+        f.close()
+
+
+    def display_graph_by_specific_mac(self, mac_address):
+
+        G = nx.Graph()
+
+        count = 0
+        edges_list = []
+
+        for pkt in self.pcap_file:
+
+            src = pkt[Dot11].addr1
+            dst = pkt[Dot11].addr2
+
+            if mac_address in [src,dst]:
+                edges_list.append((src, dst))
+                count += 1
+
+
+        plt.clf()
+        plt.suptitle('communication with' + str(mac_address), fontsize=14, fontweight='bold')
+        plt.title("Number of users: " + str(count))
+        plt.rcParams.update({'font.size': 10})
+        G.add_edges_from(edges_list)
+        nx.draw(G, with_labels=True, node_color=MY_COLORS)
+        plt.show()
+
+
+    def display_by_time_interval(self, mac_address, start_time, end_time):
+
+        mac_adresses = {}  # new dictionary
+
+
+        begin_time = self.pcap_file[0].time
+
+        for pkt in self.pcap_file:
+
+            time = pkt.time - begin_time
+            if (pkt[Dot11].addr1 == mac_address) and (start_time <= time and time <= end_time):
+                mac_adresses.update({pkt[Dot11].addr2: 0})
+
+        for pkt in self.pcap_file:
+
+            time = pkt.time - begin_time
+            if (pkt[Dot11].addr1 == mac_address) and (start_time <= time and time <= end_time):
+                mac_adresses[pkt[Dot11].addr2] += 1
+
+        MA = []
+        for ma in mac_adresses:
+            MA.append(mac_adresses[ma])
+
+        plt.clf()
+        plt.suptitle('Number of packets by interval and MACaddress', fontsize=14, fontweight='bold')
+        plt.bar(range(len(mac_adresses)), sorted(MA), align='center', color=MY_COLORS)
+
+        plt.xticks(range(len(mac_adresses)), sorted(mac_adresses.keys()))
+
+        plt.rcParams.update({'font.size': 10})
+
+        plt.xlabel('Sender mac address')
+        plt.ylabel('Count')
+
+        # Set tick colors:
+        ax = plt.gca()
+        ax.tick_params(axis='x', colors='blue')
+        ax.tick_params(axis='y', colors='red')
+        ax.set_xticklabels(ax.xaxis.get_majorticklabels(), rotation=45)
+
+        plt.show()
+
+
+
+
+    def stam2(self):
+
+        # getsrcdst = lambda x: (x.info.decode("utf-8", "ignore"),x.addr1, x.addr2, x.addr3)
+        getsrcdst = lambda x: (x.info.decode("utf-8", "ignore"), x.addr3)
+
+        for pkt in self.pcap_file:
+            try:
+                c = getsrcdst(pkt)
+                print(c)
+            except AttributeError:
+                pass
+
+    def stam3(self):
+
+        aps = {}
+
+        for p in self.pcap_file:
+            # if ((p.haslayer(Dot11Beacon) or p.haslayer(Dot11ProbeResp)) and not p[Dot11].addr3):
+            if ((p.haslayer(Dot11Beacon) or p.haslayer(Dot11ProbeResp))):
+                ssid = p[Dot11Elt].info.decode("utf-8", "ignore")
+                bssid = p[Dot11].addr3
+                channel = int(ord(p[Dot11Elt:3].info))
+                capability = p.sprintf("{Dot11Beacon:%Dot11Beacon.cap%}\
+                            {Dot11ProbeResp:%Dot11ProbeResp.cap%}")
+
+                # Check for encrypted networks
+                if re.search("privacy", capability):
+                    enc = 'Encrypted'
+                else:
+                    enc = 'Not encrypted'
+
+                # Save discovered AP
+                aps[p[Dot11].addr3] = enc
+
+                # Display discovered AP
+                if bssid is not "":
+                    print("%02d\t%s\t%s\t%s" % (int(channel), enc, bssid, ssid))
+
+
 # End of class ex3
 
 
@@ -270,7 +393,7 @@ def main():
     ex3_object = open_file()
 
     # for testing a specific function
-    # ex3_object.display_by_MAC_addresses()
+    # ex3_object.display_by_sender()
     # ex3_object.display_by_access_points()
     # ex3_object.display_graph()
     # ex3_object.display_frames()
@@ -278,7 +401,15 @@ def main():
     # ex3_object.display_by_sender()
     # ex3_object.display_by_receiver()
     # ex3_object.display_bytes_per_second()
-    ex3_object.display_PER()
+    # ex3_object.display_PER()
+    # ex3_object.foo()
+    # ex3_object.stam2()
+    # ex3_object.stam3()
+    # ex3_object.save_information_as_text()
+    # ex3_object.display_graph_by_specific_mac("08:08:c2:d1:f7:9f")
+
+    ex3_object.display_by_time_interval('ff:ff:ff:ff:ff:ff',0,28)
+
 
 if __name__ == '__main__':
     main()
